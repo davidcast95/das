@@ -25,6 +25,22 @@ def get_list(doctype,filters='',fields='*',limit=20,page=0,order_by="modified DE
 	except:
 		return error_format(sys.exc_info()[1])
 
+@frappe.whitelist(allow_guest=False)
+def get_doc(doctype,name):
+	try:
+		resource = frappe.get_doc(doctype, name)
+		return success_format(resource)
+	except:
+		return error_format(sys.exc_info()[1])
+
+
+@frappe.whitelist(allow_guest=True)
+def test_json():
+	for header in frappe.request.headers:
+		if header[0] == "Token":	
+			return header[1]
+	
+	
 
 @frappe.whitelist(allow_guest=False)
 def update(doctype,name):
@@ -53,6 +69,7 @@ def insert():
 		data = json.loads(frappe.form_dict.data)
 		doc = frappe.get_doc(data)
 		doc.insert()
+		frappe.db.commit()
 		return success_format(doc)
 	except:
 		return error_format(sys.exc_info()[1])
@@ -84,7 +101,7 @@ def change_password():
 		frappe.db.commit()
 
 		return success_format(doc)
-	return error_format('not found')
+	return error_format(sys.exc_info())
 
 
 @frappe.whitelist(allow_guest=True)

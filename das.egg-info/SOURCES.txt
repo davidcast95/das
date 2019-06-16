@@ -4,9 +4,14 @@ license.txt
 requirements.txt
 setup.py
 das/__init__.py
+das/api.py
+das/file_manager.py
+das/helper.py
 das/hooks.py
 das/modules.txt
 das/patches.txt
+das/setup.py
+das/validation.py
 das.egg-info/PKG-INFO
 das.egg-info/SOURCES.txt
 das.egg-info/dependency_links.txt
@@ -19,3 +24,4 @@ das/config/docs.py
 das/das/__init__.py
 das/templates/__init__.py
 das/templates/pages/__init__.py
+das/www/__init__.py

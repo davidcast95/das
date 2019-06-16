@@ -6,12 +6,33 @@ import datetime
 from math import radians, cos, sin, asin, sqrt
 
 def strToTimedelta(time):
+	time = str(time)
 	if "." in time:
 		t = datetime.datetime.strptime(time,"%H:%M:%S.%f")
 	else:
 		t = datetime.datetime.strptime(time,"%H:%M:%S")
 	delta = datetime.timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 	return delta
+
+def strToDatetime(dateTime):
+	dateTime = str(dateTime)
+	if "." in dateTime:
+		t = datetime.datetime.strptime(dateTime,"%Y-%m-%d %H:%M:%S.%f")
+	else:
+		t = datetime.datetime.strptime(dateTime,"%Y-%m-%d %H:%M:%S")
+	return t
+
+def strToDate(date):
+	date = str(date)
+	t = datetime.datetime.strptime(date,"%Y-%m-%d")
+	return t
+
+def timeDeltaToStr(timedelta):
+	seconds = timedelta.total_seconds()
+	hours = seconds / 3600
+	minutes = (seconds % 3600) / 60
+	seconds = seconds % 3600 % 60
+	return "{}:{}:{}".format(int(hours),int(minutes),int(seconds))
 
 def attach(doctype,name,filedata):
 	response = {}
