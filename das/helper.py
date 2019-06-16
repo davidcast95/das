@@ -4,6 +4,8 @@ from validation import *
 from file_manager import upload
 import datetime
 from math import radians, cos, sin, asin, sqrt
+
+from frappe.utils import cstr
 import os
 import PIL
 from PIL import Image
@@ -91,8 +93,11 @@ def generate_thumbnail(filename, doctype, name, field):
 	# generate thumbnail using Image PIL
 	sitename = cstr(frappe.local.site)
 	cd = os.getcwd()
-	img = Image.open(os.path.join(cd,sitename,'private','files',filename))
-	basewidth = 300
+	if 'private' not in filename:
+		img = Image.open(os.path.join(cd,sitename,'public') + filename)
+	else:
+		img = Image.open(os.path.join(cd,sitename) + filename)
+	basewidth = 600
 	wpercent = (basewidth / float(img.size[0]))
 	hsize = int((float(img.size[1]) * float(wpercent)))
 	img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
@@ -105,28 +110,29 @@ def generate_thumbnail(filename, doctype, name, field):
 	req = frappe.local.form_dict
 	req.filedata = img_str
 	req.name = name
-	req.filename = "thumbnail_{}".format(filename)
+	filename_attr = filename.split('/')
+	req.filename = "thumbnail_{}".format(filename_attr[len(filename_attr) - 1])
 	
 	response = {}
-	try:
-		uploaded = upload(doctype, req.name, 1)
+	# try:
+	uploaded = upload(doctype, req.name, 1)
 
-		response["code"] = 200
-		response["message"] = "Success"
-		response["data"] = uploaded
+	response["code"] = 200
+	response["message"] = "Success"
+	response["data"] = uploaded
 
-		frappe.db.sql("UPDATE `tab{}` SET {}='{}' WHERE name='{}'".format(doctype, field, uploaded['file_url'], name))
+	frappe.db.sql("UPDATE `tab{}` SET {}='{}' WHERE name='{}'".format(doctype, field, uploaded['file_url'], name))
 
-		frappe.db.commit()
+	frappe.db.commit()
 
 
-	except Exception as e:
-		response["code"] = 400
-		response["message"] = e.message
-		response["data"] = ""
-	except UnboundLocalError as e:
-		response["code"] = 401
-		response["message"] = e.message
-		response["data"] = ""
+	# except Exception as e:
+	# 	response["code"] = 400
+	# 	response["message"] = e.message
+	# 	response["data"] = ""
+	# except UnboundLocalError as e:
+	# 	response["code"] = 401
+	# 	response["message"] = e.message
+	# 	response["data"] = ""
 
 	return response
